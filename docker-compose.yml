@@ -16,7 +16,7 @@ services:
   mysql:
     image: mysql
     volumes:
-      - C:/Users/admin/Desktop/docker-phptest/DB:/var/lib/mysql #Path for DB folder of the website
+      - C:/Users/admin/Desktop/docker-phptest/DB:/var/lib/mysql #Path for DB folder of the website.  
     environment:
       MYSQL_ROOT_PASSWORD: admin123 #Password setup to use in phpmyadmin login page
     networks:
