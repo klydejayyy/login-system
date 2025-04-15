@@ -1,55 +1,64 @@
 <?php
 session_start();
 $conn = mysqli_connect('mysql', 'root', 'admin123', 'user_account_db');
+
 if (isset($_POST['Signin'])) {
-
+    # Login Credentials
     $username = mysqli_real_escape_string($conn, $_POST['username']);
-    $password = mysqli_real_escape_string($conn, $_POST['password']);
+    $login_password = mysqli_real_escape_string($conn, $_POST['password']);
 
-    $select = " SELECT * FROM accounts WHERE username = '$username' && password = '$password'";
-
+    # Fetch user by username
+    $select = "SELECT * FROM accounts WHERE username = '$username'";
     $result = mysqli_query($conn, $select);
 
     if (mysqli_num_rows($result) > 0) {
-        $row = mysqli_fetch_array($result);
-        $_SESSION['user_name'] = $row['username'];
-        header('Location: welcome-page.php');
-        exit();
+        $row = mysqli_fetch_assoc($result); // use assoc for easier key access
+        $hashed_password = $row['password'];
+
+        # Use password_verify to check input password against hashed one
+        if (password_verify($login_password, $hashed_password)) {
+            $_SESSION['user_name'] = $row['username'];
+            header('Location: welcome-page.php');
+            exit();
+        } else {
+            $error[] = 'Incorrect username or password!';
+        }
     } else {
         $error[] = 'Incorrect username or password!';
-    };
-};
+    }
+}
 
 if (isset($_POST['Signup'])) {
-
+    #Signup credentials
     $username = mysqli_real_escape_string($conn, $_POST['signup_username']);
     $email = mysqli_real_escape_string($conn, $_POST['signup_email']);
-    $password = mysqli_real_escape_string($conn, $_POST['signup_password']);
+    $signup_password = mysqli_real_escape_string($conn, $_POST['signup_password']);
     $cpassword = mysqli_real_escape_string($conn, $_POST['signup_cpassword']);
 
-    $select = " SELECT * FROM accounts WHERE username = '$username' && email = '$email'";
+    #Hashing Password for Signup
+    $options = [
+        'cost' => 12
+    ];
+    $hashed_password = password_hash($signup_password, PASSWORD_BCRYPT, $options);
 
+    #Putting the user credentials to db with validations
+    $select = " SELECT * FROM accounts WHERE username = '$username' && email = '$email'";
     $result = mysqli_query($conn, $select);
 
     if (mysqli_num_rows($result) > 0) {
         $error[] = 'User already exist!';
     } else {
-        if ($password != $cpassword) {
+        if ($signup_password != $cpassword) {
             $error[] = 'Password not matched!';
         } else {
-            $insert = "INSERT INTO accounts(username, email, password) VALUES ('$username','$email','$password')";
+            $insert = "INSERT INTO accounts(username, email, password) VALUES ('$username','$email','$hashed_password')";
             mysqli_query($conn, $insert);
-            header('Location: welcome-page.php');
+            header('Location: login-signup.php');
             exit();
         };
     };
 };
 ?>
-
-
-
-
-
 
 
 

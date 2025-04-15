@@ -3,7 +3,7 @@ session_start();
 $conn = mysqli_connect('mysql', 'root', 'admin123', 'user_account_db');
 
 if (!isset($_SESSION['user_name'])) {
-  header('Location: Admin-login-sign-up.php');
+  header('Location: login-signup.php');
   exit();
 }
 ?>
