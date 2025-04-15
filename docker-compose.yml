@@ -1,0 +1,38 @@
+version: '3.8'
+
+services:
+  apache-php:
+    image: apache-mysqli
+    build:
+      context: . #Path where is the dockerfile located
+      dockerfile: Dockerfile
+    volumes:
+      - C:/Users/admin/Desktop/docker-phptest/login-system:/var/www/html  #Path for the php website folder
+    ports:
+      - "80:80"
+    networks:
+      - app-network
+
+  mysql:
+    image: mysql
+    volumes:
+      - C:/Users/admin/Desktop/docker-phptest/DB:/var/lib/mysql #Path for DB folder of the website
+    environment:
+      MYSQL_ROOT_PASSWORD: admin123 #Password setup to use in phpmyadmin login page
+    networks:
+      - app-network
+
+  phpmyadmin:
+    image: phpmyadmin
+    environment:
+      PMA_HOST: mysql
+    ports:
+      - "8080:80"
+    depends_on:
+      - mysql
+    networks:
+      - app-network
+
+networks:
+  app-network:
+    driver: bridge
